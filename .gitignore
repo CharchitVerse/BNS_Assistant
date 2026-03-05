@@ -23,7 +23,6 @@ env/
 *.swo
 
 # Data (generated locally)
-data/chroma_db/
 data/*.pdf
 
 # Streamlit
