@@ -22,7 +22,7 @@ env/
 *.swp
 *.swo
 
-# Data (generated locally)
+
 data/*.pdf
 
 # Streamlit
