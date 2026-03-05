@@ -23,6 +23,7 @@ env/
 *.swo
 
 
+
 data/*.pdf
 
 # Streamlit
