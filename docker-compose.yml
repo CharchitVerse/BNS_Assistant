@@ -1,0 +1,45 @@
+# ============================================================================
+# BNS Legal RAG — Docker Compose (Local Development)
+# ============================================================================
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: bns-postgres
+    environment:
+      POSTGRES_USER: bns_user
+      POSTGRES_PASSWORD: bns_password
+      POSTGRES_DB: bns_rag
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bns_user -d bns_rag"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build: .
+    container_name: bns-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://bns_user:bns_password@postgres:5432/bns_rag
+      DATABASE_URL_SYNC: postgresql://bns_user:bns_password@postgres:5432/bns_rag
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      CHROMA_PERSIST_DIR: /app/data/chroma_db
+      APP_ENV: development
+      CORS_ORIGINS: '["http://localhost:8501"]'
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,0 +1,32 @@
+# render.yaml — Render Blueprint for one-click deploy
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: bns-legal-rag-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bns-postgres
+          property: connectionString
+        # Render provides sync URL; we transform for asyncpg in app
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: CHROMA_PERSIST_DIR
+        value: /app/data/chroma_db
+      - key: CORS_ORIGINS
+        value: '["https://your-app.streamlit.app"]'
+    plan: free
+    healthCheckPath: /api/health
+
+databases:
+  - name: bns-postgres
+    plan: free
+    databaseName: bns_rag
+    user: bns_user
